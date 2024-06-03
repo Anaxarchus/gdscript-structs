@@ -3,17 +3,17 @@ extends Node2D
 var start_time: float
 
 func _ready() -> void:
-    var count: int = 1_000_000
+    var count: int = 100_000
     var sets := generate_sets(100)
 
     print("sets hash: ", sets.hash())
 
     var sample_instance:int = randi_range(0, count-1)
     test_structs(count, sets, sample_instance)
-    test_objects(count, sets, sample_instance)
-    test_resources(count, sets, sample_instance)
-    test_nodes(count, sets, sample_instance)
-    test_node2ds(count, sets, sample_instance)
+    #test_objects(count, sets, sample_instance)
+    #test_resources(count, sets, sample_instance)
+    #test_nodes(count, sets, sample_instance)
+    #test_node2ds(count, sets, sample_instance)
 
 func test_structs(count: int, sets: Array[Dictionary], subject: int):
     var test := BaseStruct.new()
@@ -27,10 +27,8 @@ func test_structs(count: int, sets: Array[Dictionary], subject: int):
     var bmu := OS.get_static_memory_usage()
 
     time_start()
-    for i in count:
-        test.instance()
+    test.group_instance(count)
     var construction_time := time_end()
-    var memory := OS.get_static_memory_usage() - bmu
 
     time_start()
     for prop in sets:
@@ -41,6 +39,8 @@ func test_structs(count: int, sets: Array[Dictionary], subject: int):
     for prop in sets:
         test.get_value(prop.property, subject)
     var get_time := time_end()
+
+    var memory := OS.get_static_memory_usage() - bmu
 
     print("\nTest Results: Structs -----------------------")
     print("Number of instances: ", count)

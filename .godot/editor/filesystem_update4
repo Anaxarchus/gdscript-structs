@@ -1,5 +1,4 @@
 res://test.tscn
-res://Structs/struct.gd
-res://test.gd
-res://results.txt
 res://README.md
+res://Structs/base_struct.gd
+res://test.gd
