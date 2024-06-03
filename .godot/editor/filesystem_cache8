@@ -1,0 +1,10 @@
+ea4bc82a6ad023ab7ee23ee620429895
+::res://::1717424382
+benchmarks.png::CompressedTexture2D::2083356202363350806::1717424355::1717424382::1::::<><>::
+icon.svg::CompressedTexture2D::8642320688479720956::1716756807::1717422347::1::::<><>::
+README.md::TextFile::-1::1717419134::0::1::::<><>::
+results.txt::TextFile::-1::1717424384::0::1::::<><>::
+test.gd::GDScript::-1::1717424033::0::1::::<>Node2D<>::
+test.tscn::PackedScene::6208142386567486439::1717424384::0::1::::<><>::res://test.gd
+::res://Structs/::1717423092
+struct.gd::GDScript::-1::1717423092::0::1::::BaseStruct<>Resource<>::
