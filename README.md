@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `BaseStruct` class is an extendable `Resource` designed to handle structured data in a flexible and efficient manner. This class allows for dynamic property management and provides methods for instance manipulation, property setting/getting, and default value handling.
+The `BaseStruct` class is an extendable `Resource` implementing Godot's server/resource pattern to provide highly memory optimized and type safe structs. Data is distributed into <Type>PackedArrays and is accessed through the structs index, which doubles as its unique ID. This convention allows for very fast lookups, on par with Godot's internal Classes, while maintaining a memory footprint more then 25x smaller then an identical `Object` and more then 35x smaller then an identical `Node2D`. See [Benchmarks](#benchmarks) for results. 
 
 ## Features
 
@@ -44,7 +44,7 @@ struct.changed_disconnect(instance_id, _my_callback_function)
 The primary use case for this class is reducing memory usage when using thousands, hundreds of thousands or even millions of objects. See [Benchmarks](#benchmarks) for results.
 
 ### Serialization
-The class extends `Resource`, and is designed to be able to quickly serialize and deserialize your entire collection of objects.
+The class extends `Resource`, and is designed to be able to easily save and load your entire collection of struct instances.
 
 ## Usage
 
@@ -84,7 +84,7 @@ struct.get_value("name_of_property", instance_id) # Returns "updated_value"
 - ***Memory:*** 8gb
 
 ### Source
-[Test Functions](test.gd)|[Data](benchmarks.txt)
+[Test Functions](test.gd) | [Data](benchmarks.txt)
 
 ### Memory Usage
 ![Memory Usage per 100k instances](Memory100k.png)
