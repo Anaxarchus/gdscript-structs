@@ -8,7 +8,7 @@ The `BaseStruct` class is an extendable `Resource` designed to handle structured
 
 ### Type Safety
 Data is kept in typed arrays. The default getter and setter use the `Variant` type. To Rigidly enforce type safety, extend the class and implement typed getters and setters for each property:
-    ``` swift
+    ```
     class_name SpatialStruct extends BaseStruct
 
     func _init():
@@ -39,14 +39,14 @@ The class extends `Resource`, and is designed to be able to quickly serialize an
 
 ### Defining Properties
 Properties are defined through the `add_property` method.
-    ```swift
+    ```
     var struct := BaseStruct.new()
     struct.add_property("name", BaseStruct.DataType.String, "MyStruct")
     ```
 
 ### Creating and Deleting Instances
 Creating new instances is straightforward, and the constructor method returns the id of the instance.
-    ```swift
+    ```
     var struct := BaseStruct.new()
 
     # Create a new instance
@@ -57,7 +57,7 @@ Creating new instances is straightforward, and the constructor method returns th
     ```
 
 ### Getting and Setting instance values
-    ```swift
+    ```
     var struct := BaseStruct.new()
     struct.add_property("name_of_property", BaseStruct.DataType.String, "value_of_property")
     var instance_id: int = struct.instance()
@@ -66,6 +66,23 @@ Creating new instances is straightforward, and the constructor method returns th
     struct.get_value("name_of_property", instance_id) # Returns "updated_value"
     ```
 
-
 ## Benchmarks
-![Benchmarks](benchmarks.png)
+
+### Hardware
+-***CPU:*** Apple M2
+-***Memory:*** 8gb
+
+### Source
+[Test Functions](test.gd)|[Data](benchmarks.txt)
+
+### Memory Usage
+![Memory Usage per 100k instances](Memory100k.png)
+
+### Construction Speed
+![Construction Speed per 100k instances](Construction100k.png)
+
+### Property Set Speed
+![Property Set Speed](SetSpeed.png)
+
+### Property Get Speed
+![Property Get Speed](GetSpeed.png)

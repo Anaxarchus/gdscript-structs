@@ -3,7 +3,7 @@ extends Node2D
 var start_time: float
 
 func _ready() -> void:
-    var count: int = 100_000
+    var count: int = 1_000_000
     var sets := generate_sets(100)
 
     print("sets hash: ", sets.hash())
