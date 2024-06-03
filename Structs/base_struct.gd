@@ -77,8 +77,15 @@ func set_value(property: String, sid: int, value: Variant) -> void:
 func get_value(property: String, sid:int) -> Variant:
     return _data[property][sid]
 
-func instance_changed_connect(sid: int, callback: Callable) -> void:
+func changed_connect(sid: int, callback: Callable) -> void:
     _signals[sid] = _signals.get(sid, []).append(callback)
+
+func changed_disconnect(sid: int, callback: Callable) -> void:
+    if sid in _signals:
+        if callback in _signals[sid]:
+            _signals[sid].erase(callback)
+            if _signals[sid].is_empty():
+                _signals.erase(sid)
 
 func get_instance_as_dictionary(sid: int) -> Dictionary:
     var res: Dictionary
