@@ -19,121 +19,112 @@ enum DataType {
     TypeColor
 }
 
-var _data               : Dictionary
-var _property_defaults  : Dictionary
-var _property_types     : Dictionary
-var _signals            : Dictionary
-var _count              : int
-var _free_id            : PackedInt64Array
+@export
+var data               : Dictionary
+@export
+var property_defaults  : Dictionary
+@export
+var property_types     : Dictionary
+@export
+var signals            : Dictionary
+@export
+var count              : int
 
 func property_get_type(property: String) -> DataType:
-    return _property_types[property]
+    return property_types[property]
 
 func property_get_default(property: String) -> Variant:
-    return _property_defaults[property]
+    return property_defaults[property]
 
 func property_set_default(property: String, value: Variant) -> void:
-    _property_defaults[property] = value
+    property_defaults[property] = value
 
 func add_property(name: String, type: DataType, default: Variant=null) -> void:
-    _property_defaults[name] = _get_default_value(type) if default == null else default
-    _property_types[name] = type
+    property_defaults[name] = _get_default_value(type) if default == null else default
+    property_types[name] = type
     match type:
         DataType.TypeString:
-            _data[name] = PackedStringArray()
-            _data[name].resize(_count)
+            data[name] = PackedStringArray()
+            data[name].resize(count)
         DataType.TypeInt64:
-            _data[name] = PackedInt64Array()
-            _data[name].resize(_count)
+            data[name] = PackedInt64Array()
+            data[name].resize(count)
         DataType.TypeInt32:
-            _data[name] = PackedInt32Array()
-            _data[name].resize(_count)
+            data[name] = PackedInt32Array()
+            data[name].resize(count)
         DataType.TypeFloat64:
-            _data[name] = PackedFloat32Array()
-            _data[name].resize(_count)
+            data[name] = PackedFloat32Array()
+            data[name].resize(count)
         DataType.TypeFloat32:
-            _data[name] = PackedFloat64Array()
-            _data[name].resize(_count)
+            data[name] = PackedFloat64Array()
+            data[name].resize(count)
         DataType.TypeVector2:
-            _data[name] = PackedVector2Array()
-            _data[name].resize(_count)
+            data[name] = PackedVector2Array()
+            data[name].resize(count)
         DataType.TypeVector3:
-            _data[name] = PackedVector3Array()
-            _data[name].resize(_count)
+            data[name] = PackedVector3Array()
+            data[name].resize(count)
         DataType.TypeColor:
-            _data[name] = PackedColorArray()
-            _data[name].resize(_count)
+            data[name] = PackedColorArray()
+            data[name].resize(count)
 
-## When an instance is destroyed, it's values are zeroed but its indices are left in place.
-## In testing, I found that using indices was the only way to achieve competitive get/set speeds.
-## For this reason, instances are ID'd by their index, and therefore indices cannot be allowed to shift
-## when an instance is destroyed. Those columns will be tracked, and new instances will attempt
-## to reclaim them.
-func _instance(reclaim_memory: bool) -> int:
-    if _free_id.is_empty() or !reclaim_memory:
-        for property in _data.keys():
-            _data[property].append(_count, _property_defaults[property])
-        _count += 1
-        return _count-1
-    else:
-        var id := _free_id[0]
-        _free_id.remove_at(0)
-        return id
+func _instance() -> int:
+        for property in data.keys():
+            data[property].append(count, property_defaults[property])
+        count += 1
+        return count-1
 
-## Single instances will attempt to reclaim memory
 func instance() -> int:
-    return _instance(true)
+    return _instance()
 
-## Batch instances will use a fresh contiguous block, not attempting to reclaim memory.
-# TODO: look into thread safe ways of reclaiming memory.
 func batch_instance(group_size: int) -> void:
-    for prop in _data.keys():
-        _data[prop].resize(_count + group_size)
-    var id := WorkerThreadPool.add_group_task(_instance.bind(false), group_size)
+    for prop in data.keys():
+        data[prop].resize(count + group_size)
+    var id := WorkerThreadPool.add_group_task(_instance, group_size)
     WorkerThreadPool.wait_for_group_task_completion(id)
 
 ## Deleting an instance simply zeroes its data, reducing its overhead but leaving it's column in place
-## so as not to shift the indices of other instances. This memory can be reclaimed later.
+## so as not to shift the indices of other instances.
 func delete(sid: int) -> void:
-    for property in _data.keys():
-        _data[property] = _property_defaults[property]
-    if sid in _signals:
-        _signals.erase(sid)
+    for property in data.keys():
+        data[property] = property_defaults[property]
+    if sid in signals:
+        signals.erase(sid)
 
 ## Clears all instance data.
 func clear() -> void:
-    _data.clear()
-    _count = 0
+    data.clear()
+    count = 0
 
 func set_value(property: String, sid: int, value: Variant) -> void:
-    _data[property][sid] = value
-    if sid in _signals:
+    data[property][sid] = value
+    if sid in signals:
         _changed_call(sid)
 
 func get_value(property: String, sid:int) -> Variant:
-    return _data[property][sid]
+    return data[property][sid]
 
 ## At the moment, the only flags implemented are None and Deferred.
 func changed_connect(sid: int, callback: Callable, flags: Object.ConnectFlags = 0) -> void:
     var sig_hash := callback.hash()
-    var sid_sigs: Dictionary = _signals.get(sid, {})
+    var sid_sigs: Dictionary = signals.get(sid, {})
     var sig_dat: Dictionary = sid_sigs.get(sig_hash, {})
     sig_dat["callback"] = callback
     sig_dat["flags"] = flags
     sid_sigs[sig_hash] = sig_dat
-    _signals[sid] = sid_sigs
+    signals[sid] = sid_sigs
 
 func changed_disconnect(sid: int, callback: Callable) -> void:
-    if _signals.has(sid):
-        if _signals[sid].has(callback):
-            _signals[sid].erase(callback)
-            if _signals[sid].is_empty():
-                _signals.erase(sid)
+    if signals.has(sid):
+        if signals[sid].has(callback):
+            signals[sid].erase(callback)
+            if signals[sid].is_empty():
+                signals.erase(sid)
 
 func get_instance_as_dictionary(sid: int) -> Dictionary:
     var res: Dictionary
-    for property in _data.keys():
-        res[property] = _data[property][sid]
+    for property in data.keys():
+        res[property] = data[property][sid]
     return res
 
 func print_instance(sid: int) -> void:
@@ -161,8 +152,8 @@ func _get_default_value(type: DataType) -> Variant:
             return null
 
 func _changed_call(sid: int) -> void:
-    for key in _signals.get(sid, {}).keys():
-        if _signals[sid][key]["flags"] == Object.CONNECT_DEFERRED:
-            _signals[sid][key]["callback"].call_deferred(sid)
+    for key in signals.get(sid, {}).keys():
+        if signals[sid][key]["flags"] == Object.CONNECT_DEFERRED:
+            signals[sid][key]["callback"].call_deferred(sid)
         else:
-            _signals[sid][key]["callback"].call(sid)
+            signals[sid][key]["callback"].call(sid)

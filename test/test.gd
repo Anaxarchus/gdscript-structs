@@ -1,8 +1,10 @@
 extends Node2D
 
 var start_time: float
+var test: Struct
 
 func _ready() -> void:
+    test = Struct.new()
     var count: int = 100_000
     var sets := generate_sets(100)
 
@@ -16,7 +18,6 @@ func _ready() -> void:
     #test_node2ds(count, sets, sample_instance)
 
 func test_structs(count: int, sets: Array[Dictionary], subject: int):
-    var test := Struct.new()
     test.add_property("editor_description", Struct.DataType.TypeString, "some description")
     test.add_property("name", Struct.DataType.TypeString, "TestStruct")
     test.add_property("process_mode", Struct.DataType.TypeInt32, 1)
@@ -27,7 +28,7 @@ func test_structs(count: int, sets: Array[Dictionary], subject: int):
     var bmu := OS.get_static_memory_usage()
 
     time_start()
-    test.group_instance(count)
+    test.batch_instance(count)
     var construction_time := time_end()
 
     time_start()
@@ -40,12 +41,15 @@ func test_structs(count: int, sets: Array[Dictionary], subject: int):
         test.get_value(prop.property, subject)
     var get_time := time_end()
 
-    var memory := OS.get_static_memory_usage() - bmu
+    var memory := OS.get_static_memory_usage()
 
     print("\nTest Results: Structs -----------------------")
     print("Number of instances: ", count)
     print("Construction time: ", construction_time)
-    print("Memory usage: ", float(memory)/1_000_000, "mb")
+    print("")
+    print("Total Memory Used Before Instancing: ", float(bmu)/1_000_000, "mb")
+    print("Total Memory Used After Instancing: ", float(memory)/1_000_000, "mb")
+    print("Struct Memory Usage: ", float(memory-bmu)/1_000_000, "mb")
     print("")
     print("Number of properties set: ", sets.size())
     print("Time to complete all sets: ", set_time)
