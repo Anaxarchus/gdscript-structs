@@ -2,106 +2,53 @@
 
 ## Overview
 
-The `Struct` class is an extendable `Resource` implementing Godot's server/resource pattern to provide highly memory optimized and type safe structs. Data is distributed into <Type>PackedArrays and is accessed through the structs index, which doubles as its unique ID. This convention allows for very fast lookups, on par with Godot's internal Classes, while maintaining a memory footprint more then 25x smaller then an identical `Object` and more then 35x smaller then an identical `Node2D`. See [Benchmarks](#benchmarks) for results.
+The `Struct` class is an extendable `Resource` implementing Godot's server/resource pattern to provide highly memory optimized and type safe structs. Data is distributed into <Type>PackedArrays and is accessed through the structs index, which doubles as its unique ID. This convention allows for very fast lookups, on par with Godot's internal Classes, while maintaining a memory footprint more then 25x smaller then an identical `Object` and more then 35x smaller then an identical `Node2D`.
 
-<<<<<<< Updated upstream
-## Features
 
-### Type Safety
-Data is kept in typed arrays. The default getter and setter use the `Variant` type. To Rigidly enforce type safety, extend the class and implement typed getters and setters for each property:
+
+## Usage
+
+### Working directly with Struct
+
+Using the `Struct` is straightforward.
+```
+var spatial := Struct.new([
+    "position": {"type": Struct.DataType.Vector3, "default": Vector3.ZERO},
+    "rotation": {"type": Struct.DataType.Vector3, "default": Vector3.ZERO},
+    "scale": {"type": Struct.DataType.Vector3, "default": Vector3.ZERO},
+])
+```
+
+Managing your instances works much the same as it does with a `MultiMeshInstance`:
+```
+spatial.instance_count = 1000
+```
+
+Updating can be done in one of two ways, either through the property name itself:
+```
+spatial.instance_set_property("position", instance_index, Vector3(1, 1, 1))
+```
+
+Or more performantly through the properties index:
+```
+# Since `position` was the first property we passed, it's index is 0.
+spatial.instance_set_at(0, instance_index, Vector3(1, 1, 1))
+```
+
+### Extending Struct
+
+Extending the struct class can be very convenient for enabling editor hints:
 ```
 class_name SpatialStruct extends Struct
 
 func _init():
-    add_property("position", DataType.Vector3, Vector3.ZERO)
+    property_add("position", DataType.TypeVector3, Vector3.ZERO)
+    property_add("rotation", DataType.TypeVector3, Vector3.ZERO)
+    property_add("scale", DataType.TypeVector3, Vector3.ZERO)
 
-func set_position(instance_id: int, value: Vector3) -> void:
-    set_value("position", instance_id, value)
-
-func get_position(instance_id: int) -> Vector3:
-    return get_value("position", instance_id)
-```
-[Full Example](test/example_struct.gd)
-
-To improve speeds, skip the overhead of the extra function call and interact with the data directly.
-```
-func set_position(instance_id: int, value: Vector3) -> void:
-    data["position"][instance_id] = value
+func get_position(instance_id: int, value: Vector3) -> void:
+    data[0][instance_id] = value
 
 func get_position(instance_id: int) -> Vector3:
-    return data["position"][instance_id]
+    return data[0][instance_id]
 ```
-
-### Signals
-Like `Resource`, Structs offer a `changed` signal.
-```
-var struct := BaseStruct.new()
-var instance_id := struct.instance()
-
-struct.changed_connect(instance_id, _my_callback_function)
-struct.changed_disconnect(instance_id, _my_callback_function)
-```
-
-### Memory Efficiency
-The primary use case for this class is reducing memory usage when using thousands, hundreds of thousands or even millions of objects. See [Benchmarks](#benchmarks) for results.
-
-### Serialization
-The class extends `Resource`, and is designed to be able to easily save and load your entire collection of struct instances.
-
-## Usage
-
-### Defining Properties
-Properties are defined through the `add_property` method.
-```
-var struct := Struct.new()
-struct.add_property("name", BaseStruct.DataType.String, "MyStruct")
-```
-
-### Creating and Deleting Instances
-Creating new instances is straightforward, and the constructor method returns the id of the instance.
-```
-var struct := Struct.new()
-
-# Create a new instance
-var instance_id: int = struct.instance()
-
-# Delete the instance
-struct.delete(instance_id)
-```
-
-### Getting and Setting instance values
-```
-var struct := BaseStruct.new()
-struct.add_property("name_of_property", BaseStruct.DataType.String, "default_value")
-var instance_id: int = struct.instance()
-
-struct.set_value("name_of_property", instance_id, "updated_value")
-struct.get_value("name_of_property", instance_id) # Returns "updated_value"
-```
-
-## Benchmarks
-
-### Hardware
-- ***CPU:*** Apple M2
-- ***Memory:*** 8gb
-
-### Source
-[Test Functions](test/test.gd) | [Data](test/benchmarks.txt)
-
-### Memory Usage
-![Memory Usage per 100k instances](test/Memory100k.png)
-
-### Construction Speed
-![Construction Speed per 100k instances](test/Construction100k.png)
-
-NOTE: using the batch_instance method brings construction speeds down to 0.032 seconds per 100,000 instances
-
-### Property Set Speed
-![Property Set Speed](test/SetSpeed.png)
-
-### Property Get Speed
-![Property Get Speed](test/GetSpeed.png)
-=======
-## Emergency update
-README was out of date and containing incorrect usage and information, I'll be putting it back up shortly, but this repository suddenly started getting visitors and I panicked that things were not in order. Sorry for any confusion.
->>>>>>> Stashed changes
