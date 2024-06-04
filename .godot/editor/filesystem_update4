@@ -1,7 +1,5 @@
-res://test.tscn
-res://Structs/base_struct.gd
-res://structs/base_struct.gd
 res://test/test.tscn
+res://test/test.gd
+res://addons/structs/struct.gd
 res://test/test_struct.gd
-res://README.md
-res://test/benchmarks.txt
+res://test/example_struct.gd

@@ -14,3 +14,7 @@ config/name="Structs"
 run/main_scene="res://test/test.tscn"
 config/features=PackedStringArray("4.2", "Forward Plus")
 config/icon="res://icon.svg"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/structs/plugin.cfg")

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<svg width="249" height="227" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit-->
+ <defs>
+  <symbol height="24" id="svg_1" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+   <path d="m15,8l-3,0l0,-2l3,0l0,2zm0,-6l-3,0l0,2l3,0l0,-2zm-3,2l-3,0l0,2l3,0l0,-2zm0,4l-3,0l0,2l3,0l0,-2zm0,-8l-3,0l0,2l3,0l0,-2zm0,24c-3.25,0 -5.64,-1.84 -4.85,-5l1.85,-7l3,0l0,-2l3,0l0,2l1.85,7c0.79,3.15 -1.6,5 -4.85,5zm2.99,-3.88c0,-2.68 -5.99,-2.62 -5.99,0.01c0,2.52 5.99,2.54 5.99,-0.01z" id="svg_6"/>
+  </symbol>
+  <symbol height="24" id="svg_3" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+   <path d="m23,10.83l0,2.35c-1.56,0 -3,1.31 -3,2.85c0,2.18 1.28,5.97 -6,5.97l0,-2c4.92,0 3.97,-1.6 3.97,-3.97c0,-2.09 1.21,-3.5 2.27,-4.03c-1.06,-0.53 -2.27,-1.44 -2.27,-3.31c0,-2.37 0.94,-4.69 -3.97,-4.69l0,-2c7.28,0 6,4.51 6,6.69c0,1.54 1.44,2.14 3,2.14zm-19,-2.14c0,-2.18 -1.28,-6.69 6,-6.69l0,2c-4.91,0 -3.97,2.32 -3.97,4.69c0,1.87 -1.21,2.78 -2.27,3.31c1.06,0.53 2.27,1.94 2.27,4.03c0,2.37 -0.95,3.97 3.97,3.97l0,2c-7.28,0 -6,-3.79 -6,-5.97c0,-1.54 -1.44,-2.86 -3,-2.86l0,-2.34c1.56,0 3,-0.6 3,-2.14z" id="svg_7"/>
+  </symbol>
+ </defs>
+ <g class="layer">
+  <title>Layer 1</title>
+  <g id="svg_5">
+   <use fill="#ffffff" id="svg_2" transform="matrix(6.66667 0 0 6.66667 -7.37 -14.03)" x="7.8" xlink:href="#svg_1" y="7.5"/>
+   <use fill="#ffffff" id="svg_4" transform="matrix(11.3303 0 0 11.3303 -11.3341 -22.6578)" x="0" xlink:href="#svg_3" y="0"/>
+  </g>
+ </g>
+</svg>

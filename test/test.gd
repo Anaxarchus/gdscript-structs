@@ -16,14 +16,14 @@ func _ready() -> void:
     #test_node2ds(count, sets, sample_instance)
 
 func test_structs(count: int, sets: Array[Dictionary], subject: int):
-    var test := BaseStruct.new()
-    test.add_property("editor_description", BaseStruct.DataType.TypeString, "some description")
-    test.add_property("name", BaseStruct.DataType.TypeString, "TestStruct")
-    test.add_property("process_mode", BaseStruct.DataType.TypeInt32, 1)
-    test.add_property("process_physics_priority", BaseStruct.DataType.TypeInt32, 999)
-    test.add_property("process_priority", BaseStruct.DataType.TypeInt32, 999)
-    test.add_property("process_thread_group_order", BaseStruct.DataType.TypeInt32, 999)
-    test.add_property("scene_file_path", BaseStruct.DataType.TypeString, "some/filepath/to/somewhere")
+    var test := Struct.new()
+    test.add_property("editor_description", Struct.DataType.TypeString, "some description")
+    test.add_property("name", Struct.DataType.TypeString, "TestStruct")
+    test.add_property("process_mode", Struct.DataType.TypeInt32, 1)
+    test.add_property("process_physics_priority", Struct.DataType.TypeInt32, 999)
+    test.add_property("process_priority", Struct.DataType.TypeInt32, 999)
+    test.add_property("process_thread_group_order", Struct.DataType.TypeInt32, 999)
+    test.add_property("scene_file_path", Struct.DataType.TypeString, "some/filepath/to/somewhere")
     var bmu := OS.get_static_memory_usage()
 
     time_start()

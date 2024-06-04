@@ -1,4 +1,4 @@
-class_name TestStruct extends BaseStruct
+class_name ExampleStruct extends Struct
 
 
 func _init() -> void:
