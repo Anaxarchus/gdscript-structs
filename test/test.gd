@@ -6,35 +6,28 @@ var start_time: float
 
 
 func _ready() -> void:
-    var test := Struct.new([
-        { "name": "position", "type": Struct.DataType.TypeVector3, "default": Vector3.ZERO },
-        { "name": "rotation", "type": Struct.DataType.TypeVector3, "default": Vector3.ZERO },
-        { "name": "scale", "type": Struct.DataType.TypeVector3, "default": Vector3.ZERO },
-    ])
-    var count: int = 1_000_000
+    var count: int = 100_000
     var sets := generate_sets(100)
 
     print("sets hash: ", sets.hash())
 
     var sample_instance:int = randi_range(0, count-1)
-    test_structs(test, count, sets, sample_instance)
+    #test_structs(count, sets, sample_instance)
     #test_objects(count, sets, sample_instance)
     #test_resources(count, sets, sample_instance)
     #test_nodes(count, sets, sample_instance)
-    #test_node2ds(count, sets, sample_instance)
+    test_node2ds(count, sets, sample_instance)
 
-func test_structs(struct:ExampleStruct, count: int, sets: Array[Dictionary], subject: int):
-    #var nam := struct.add_property(Struct.DataType.TypeString, "some description")
-    #struct.add_property(Struct.DataType.TypeString, "TestStruct")
-    #struct.add_property(Struct.DataType.TypeInt32, 1)
-    #struct.add_property(Struct.DataType.TypeInt32, 999)
-    #struct.add_property(Struct.DataType.TypeInt32, 999)
-    #struct.add_property(Struct.DataType.TypeInt32, 999)
-    #struct.add_property(Struct.DataType.TypeString, "some/filepath/to/somewhere")
-    #struct.add_property(Struct.DataType.TypeVector3)
-    #struct.add_property(Struct.DataType.TypeVector3)
-    #struct.add_property(Struct.DataType.TypeVector3)
-    #sets = _sets_to_ints(sets.duplicate(true))
+func test_structs(count: int, sets: Array[Dictionary], subject: int):
+    var struct := Struct.new([
+        { "name": "editor_description", "type": Struct.DataType.TypeString, "default": "some description" },
+        { "name": "name", "type": Struct.DataType.TypeString, "default": "TestStruct" },
+        { "name": "process_mode", "type": Struct.DataType.TypeInt32, "default": 999 },
+        { "name": "process_physics_priority", "type": Struct.DataType.TypeInt32, "default": 999 },
+        { "name": "process_priority", "type": Struct.DataType.TypeInt32, "default": 999 },
+        { "name": "process_thread_group_order", "type": Struct.DataType.TypeInt32, "default": 999 },
+        { "name": "scene_file_path", "type": Struct.DataType.TypeString, "default": "some/filepath/to/somewhere" },
+    ])
     var bmu := OS.get_static_memory_usage()
 
     time_start()
@@ -42,18 +35,28 @@ func test_structs(struct:ExampleStruct, count: int, sets: Array[Dictionary], sub
     var construction_time := time_end()
 
     time_start()
-    struct.set_position(subject, Vector3.ONE)
-    struct.set_rotation(subject, Vector3.ONE)
-    struct.set_scale(subject, Vector3.ONE)
-    #for x in 2:
-        #struct.set_value(x, subject, Vector3.ONE)
-    var set_time := time_end()
+    for row in sets:
+        struct.instance_set_property(row.property, subject, row.value)
+    var set_property_time := time_end()
+
+    var pids := sets.duplicate(true)
+    for x in pids.size():
+        pids[x].property = struct.property_get_id(pids[x].property)
 
     time_start()
-    struct.get_position(subject)
-    struct.get_rotation(subject)
-    struct.get_scale(subject)
-    var get_time := time_end()
+    for row in pids:
+        struct.instance_set_at(row.property, subject, row.value)
+    var set_at_time := time_end()
+
+    time_start()
+    for row in sets:
+        struct.instance_get_property(row.property, subject)
+    var get_property_time := time_end()
+
+    time_start()
+    for row in pids:
+        struct.instance_get_at(row.property, subject)
+    var get_at_time := time_end()
 
     var memory := OS.get_static_memory_usage()
 
@@ -63,15 +66,21 @@ func test_structs(struct:ExampleStruct, count: int, sets: Array[Dictionary], sub
     print("")
     print("Total Memory Used Before Instancing: ", float(bmu)/1_000_000, "mb")
     print("Total Memory Used After Instancing: ", float(memory)/1_000_000, "mb")
-    print("Struct Memory Usage: ", float(memory-bmu)/1_000_000, "mb")
+    print("    Struct Memory Usage: ", float(memory-bmu)/1_000_000, "mb")
     print("")
     print("Number of properties set: ", sets.size())
-    print("Time to set all instances: ", set_time)
-    print("Average set time per instance: ", set_time/sets.size())
+    print("    Time to set all instances using property: ", set_property_time)
+    print("    Average set property time per instance: ", set_property_time/sets.size())
+    print("")
+    print("    Time to set all instances using index: ", set_at_time)
+    print("    Average set at time per instance: ", set_at_time/sets.size())
     print("")
     print("Number of properties get: ", sets.size())
-    print("Time to complete all gets: ", get_time)
-    print("Average get time: ", get_time/sets.size())
+    print("    Time to get all instances using property: ", get_property_time)
+    print("    Average get property time per instance: ", get_property_time/sets.size())
+    print("")
+    print("    Time to get all instances using index: ", get_at_time)
+    print("    Average get at time per instance: ", get_at_time/sets.size())
     print("----------------------------------------------\n")
 
 
@@ -100,16 +109,15 @@ func test_objects(count: int, sets: Array[Dictionary], subject: int):
 
     print("\nTest Results: Objects -----------------------")
     print("Number of instances: ", count)
-    print("Construction time: ", construction_time)
-    print("Memory usage: ", float(memory)/1_000_000, "mb")
+    print("    Memory usage: ", float(memory)/1_000_000, "mb")
     print("")
     print("Number of properties set: ", sets.size())
-    print("Time to complete all sets: ", set_time)
-    print("Average set time: ", set_time/sets.size())
+    print("    Time to complete all sets: ", set_time)
+    print("    Average set time: ", set_time/sets.size())
     print("")
     print("Number of properties get: ", sets.size())
-    print("Time to complete all gets: ", get_time)
-    print("Average get time: ", get_time/sets.size())
+    print("    Time to complete all gets: ", get_time)
+    print("    Average get time: ", get_time/sets.size())
     print("----------------------------------------------\n")
 
 func test_resources(count: int, sets: Array[Dictionary], subject: int):
@@ -134,16 +142,15 @@ func test_resources(count: int, sets: Array[Dictionary], subject: int):
 
     print("\nTest Results: Resources ----------------------")
     print("Number of instances: ", count)
-    print("Construction time: ", construction_time)
-    print("Memory usage: ", float(memory)/1_000_000, "mb")
+    print("    Memory usage: ", float(memory)/1_000_000, "mb")
     print("")
     print("Number of properties set: ", sets.size())
-    print("Time to complete all sets: ", set_time)
-    print("Average set time: ", set_time/sets.size())
+    print("    Time to complete all sets: ", set_time)
+    print("    Average set time: ", set_time/sets.size())
     print("")
     print("Number of properties get: ", sets.size())
-    print("Time to complete all gets: ", get_time)
-    print("Average get time: ", get_time/sets.size())
+    print("    Time to complete all gets: ", get_time)
+    print("    Average get time: ", get_time/sets.size())
     print("----------------------------------------------\n")
 
 func test_nodes(count: int, sets: Array[Dictionary], subject: int):
@@ -171,16 +178,15 @@ func test_nodes(count: int, sets: Array[Dictionary], subject: int):
 
     print("\nTest Results: Nodes -------------------------")
     print("Number of instances: ", count)
-    print("Construction time: ", construction_time)
-    print("Memory usage: ", float(memory)/1_000_000, "mb")
+    print("    Memory usage: ", float(memory)/1_000_000, "mb")
     print("")
     print("Number of properties set: ", sets.size())
-    print("Time to complete all sets: ", set_time)
-    print("Average set time: ", set_time/sets.size())
+    print("    Time to complete all sets: ", set_time)
+    print("    Average set time: ", set_time/sets.size())
     print("")
     print("Number of properties get: ", sets.size())
-    print("Time to complete all gets: ", get_time)
-    print("Average get time: ", get_time/sets.size())
+    print("    Time to complete all gets: ", get_time)
+    print("    Average get time: ", get_time/sets.size())
     print("----------------------------------------------\n")
 
 func test_node2ds(count: int, sets: Array[Dictionary], subject: int):
@@ -208,16 +214,15 @@ func test_node2ds(count: int, sets: Array[Dictionary], subject: int):
 
     print("\nTest Results: Node2Ds -----------------------")
     print("Number of instances: ", count)
-    print("Construction time: ", construction_time)
-    print("Memory usage: ", float(memory)/1_000_000, "mb")
+    print("    Memory usage: ", float(memory)/1_000_000, "mb")
     print("")
     print("Number of properties set: ", sets.size())
-    print("Time to complete all sets: ", set_time)
-    print("Average set time: ", set_time/sets.size())
+    print("    Time to complete all sets: ", set_time)
+    print("    Average set time: ", set_time/sets.size())
     print("")
     print("Number of properties get: ", sets.size())
-    print("Time to complete all gets: ", get_time)
-    print("Average get time: ", get_time/sets.size())
+    print("    Time to complete all gets: ", get_time)
+    print("    Average get time: ", get_time/sets.size())
     print("----------------------------------------------\n")
 
 func time_start() -> float:
