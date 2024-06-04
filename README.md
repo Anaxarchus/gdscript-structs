@@ -92,6 +92,7 @@ struct.get_value("name_of_property", instance_id) # Returns "updated_value"
 
 ### Construction Speed
 ![Construction Speed per 100k instances](test/Construction100k.png)
+
 NOTE: using the batch_instance method brings construction speeds down to 0.032 seconds per 100,000 instances
 
 ### Property Set Speed
