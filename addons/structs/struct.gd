@@ -55,7 +55,7 @@ func _init(properties:Array[Dictionary] = [], initial_instance_count:int = 0):
         assert(property.has("name"), "property is missing required parameter: `name: String`")
         assert(property.get("name") is String, "`name` property must be of type `String`")
         assert(property.has("type"), "property is missing required parameter: `type: DataType`")
-        assert(property.get("type") in DataType, "property must be member of enum `DataType`")
+        assert(property.get("type") is Struct.DataType, "property must be member of enum `DataType`")
         assert(property.has("default"), "property is missing required parameter: `default: Variant`")
         property_add(property.name, property.type, property.default)
     instance_count = initial_instance_count

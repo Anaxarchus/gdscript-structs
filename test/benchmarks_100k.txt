@@ -1,0 +1,77 @@
+Test Results: Structs -----------------------
+Number of instances: 100,000
+
+Total Memory Used Before Instancing: 55.46782mb
+Total Memory Used After Instancing: 60.76208mb
+    Struct Memory Usage: 5.29426mb
+
+Number of properties set: 100
+    Time to set all instances using property: 0.00004506111145
+    Average set property time per instance: 0.00000045061111
+
+    Time to set all instances using index: 0.0000331401825
+    Average set at time per instance: 0.00000033140182
+
+Number of properties get: 100
+    Time to get all instances using property: 0.00003385543823
+    Average get property time per instance: 0.00000033855438
+
+    Time to get all instances using index: 0.00002408027649
+    Average get at time per instance: 0.00000024080276
+----------------------------------------------
+
+
+Test Results: Objects -----------------------
+Number of instances: 100,000
+    Memory usage: 138.658616mb
+
+Number of properties set: 100
+    Time to complete all sets: 0.00004816055298
+    Average set time: 0.00000048160553
+
+Number of properties get: 100
+    Time to complete all gets: 0.00002694129944
+    Average get time: 0.00000026941299
+----------------------------------------------
+
+
+Test Results: Resources ----------------------
+Number of instances: 100,000
+    Memory usage: 151.458616mb
+
+Number of properties set: 100
+    Time to complete all sets: 0.00005507469177
+    Average set time: 0.00000055074692
+
+Number of properties get: 100
+    Time to complete all gets: 0.00002503395081
+    Average get time: 0.00000025033951
+----------------------------------------------
+
+
+Test Results: Nodes -------------------------
+Number of instances: 100000
+    Memory usage: 112.64182mb
+
+Number of properties set: 100
+    Time to complete all sets: 0.00005507469177
+    Average set time: 0.00000055074692
+
+Number of properties get: 100
+    Time to complete all gets: 0.00002884864807
+    Average get time: 0.00000028848648
+----------------------------------------------
+
+
+Test Results: Node2Ds -----------------------
+Number of instances: 100000
+    Memory usage: 185.41322mb
+
+Number of properties set: 100
+    Time to complete all sets: 0.00005698204041
+    Average set time: 0.0000005698204
+
+Number of properties get: 100
+    Time to complete all gets: 0.0000319480896
+    Average get time: 0.0000003194809
+----------------------------------------------
