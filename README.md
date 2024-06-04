@@ -4,6 +4,7 @@
 
 The `Struct` class is an extendable `Resource` implementing Godot's server/resource pattern to provide highly memory optimized and type safe structs. Data is distributed into <Type>PackedArrays and is accessed through the structs index, which doubles as its unique ID. This convention allows for very fast lookups, on par with Godot's internal Classes, while maintaining a memory footprint more then 25x smaller then an identical `Object` and more then 35x smaller then an identical `Node2D`. See [Benchmarks](#benchmarks) for results.
 
+<<<<<<< Updated upstream
 ## Features
 
 ### Type Safety
@@ -100,3 +101,7 @@ NOTE: using the batch_instance method brings construction speeds down to 0.032 s
 
 ### Property Get Speed
 ![Property Get Speed](test/GetSpeed.png)
+=======
+## Emergency update
+README was out of date and containing incorrect usage and information, I'll be putting it back up shortly, but this repository suddenly started getting visitors and I panicked that things were not in order. Sorry for any confusion.
+>>>>>>> Stashed changes

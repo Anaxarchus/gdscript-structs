@@ -1,5 +1,7 @@
 res://test/test.tscn
+res://test/fragstruct.gd
 res://test/test.gd
 res://addons/structs/struct.gd
-res://test/test_struct.gd
+res://test/benchmarks.txt
 res://test/example_struct.gd
+res://README.md

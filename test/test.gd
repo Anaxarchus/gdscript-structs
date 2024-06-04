@@ -1,44 +1,58 @@
 extends Node2D
 
 var start_time: float
-var test: Struct
+
+
+
 
 func _ready() -> void:
-    test = Struct.new()
-    var count: int = 100_000
+    var test := Struct.new([
+        { "name": "position", "type": Struct.DataType.TypeVector3, "default": Vector3.ZERO },
+        { "name": "rotation", "type": Struct.DataType.TypeVector3, "default": Vector3.ZERO },
+        { "name": "scale", "type": Struct.DataType.TypeVector3, "default": Vector3.ZERO },
+    ])
+    var count: int = 1_000_000
     var sets := generate_sets(100)
 
     print("sets hash: ", sets.hash())
 
     var sample_instance:int = randi_range(0, count-1)
-    test_structs(count, sets, sample_instance)
+    test_structs(test, count, sets, sample_instance)
     #test_objects(count, sets, sample_instance)
     #test_resources(count, sets, sample_instance)
     #test_nodes(count, sets, sample_instance)
     #test_node2ds(count, sets, sample_instance)
 
-func test_structs(count: int, sets: Array[Dictionary], subject: int):
-    test.add_property("editor_description", Struct.DataType.TypeString, "some description")
-    test.add_property("name", Struct.DataType.TypeString, "TestStruct")
-    test.add_property("process_mode", Struct.DataType.TypeInt32, 1)
-    test.add_property("process_physics_priority", Struct.DataType.TypeInt32, 999)
-    test.add_property("process_priority", Struct.DataType.TypeInt32, 999)
-    test.add_property("process_thread_group_order", Struct.DataType.TypeInt32, 999)
-    test.add_property("scene_file_path", Struct.DataType.TypeString, "some/filepath/to/somewhere")
+func test_structs(struct:ExampleStruct, count: int, sets: Array[Dictionary], subject: int):
+    #var nam := struct.add_property(Struct.DataType.TypeString, "some description")
+    #struct.add_property(Struct.DataType.TypeString, "TestStruct")
+    #struct.add_property(Struct.DataType.TypeInt32, 1)
+    #struct.add_property(Struct.DataType.TypeInt32, 999)
+    #struct.add_property(Struct.DataType.TypeInt32, 999)
+    #struct.add_property(Struct.DataType.TypeInt32, 999)
+    #struct.add_property(Struct.DataType.TypeString, "some/filepath/to/somewhere")
+    #struct.add_property(Struct.DataType.TypeVector3)
+    #struct.add_property(Struct.DataType.TypeVector3)
+    #struct.add_property(Struct.DataType.TypeVector3)
+    #sets = _sets_to_ints(sets.duplicate(true))
     var bmu := OS.get_static_memory_usage()
 
     time_start()
-    test.batch_instance(count)
+    struct.instance_count = count
     var construction_time := time_end()
 
     time_start()
-    for prop in sets:
-        test.set_value(prop.property, subject, prop.value)
+    struct.set_position(subject, Vector3.ONE)
+    struct.set_rotation(subject, Vector3.ONE)
+    struct.set_scale(subject, Vector3.ONE)
+    #for x in 2:
+        #struct.set_value(x, subject, Vector3.ONE)
     var set_time := time_end()
 
     time_start()
-    for prop in sets:
-        test.get_value(prop.property, subject)
+    struct.get_position(subject)
+    struct.get_rotation(subject)
+    struct.get_scale(subject)
     var get_time := time_end()
 
     var memory := OS.get_static_memory_usage()
@@ -52,8 +66,8 @@ func test_structs(count: int, sets: Array[Dictionary], subject: int):
     print("Struct Memory Usage: ", float(memory-bmu)/1_000_000, "mb")
     print("")
     print("Number of properties set: ", sets.size())
-    print("Time to complete all sets: ", set_time)
-    print("Average set time: ", set_time/sets.size())
+    print("Time to set all instances: ", set_time)
+    print("Average set time per instance: ", set_time/sets.size())
     print("")
     print("Number of properties get: ", sets.size())
     print("Time to complete all gets: ", get_time)
@@ -239,6 +253,26 @@ func generate_sets(count: int) -> Array[Dictionary]:
                 result.append({"property": prop, "value": rng.randi()})
 
     return result
+
+
+func _sets_to_ints(sets: Array[Dictionary]) -> Array[Dictionary]:
+    for each in sets:
+        match each.property:
+            "editor_description":
+                each.property = 0
+            "name":
+                each.property = 1
+            "process_mode":
+                each.property = 2
+            "process_physics_priority":
+                each.property = 3
+            "process_priority":
+                each.property = 4
+            "process_thread_group_order":
+                each.property = 5
+            "scene_file_path":
+                each.property = 6
+    return sets
 
 
 class TestObject extends Object:
