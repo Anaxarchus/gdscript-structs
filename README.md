@@ -46,7 +46,7 @@ func _init():
     property_add("rotation", DataType.TypeVector3, Vector3.ZERO)
     property_add("scale", DataType.TypeVector3, Vector3.ZERO)
 
-func get_position(instance_id: int, value: Vector3) -> void:
+func set_position(instance_id: int, value: Vector3) -> void:
     data[0][instance_id] = value
 
 func get_position(instance_id: int) -> Vector3:
