@@ -20,6 +20,7 @@ func set_position(instance_id: int, value: Vector3) -> void:
 func get_position(instance_id: int) -> Vector3:
     return get_value("position", instance_id)
 ```
+[Full Example](test/test_struct.gd)
 
 To improve speeds, skip the overhead of the extra function call and interact with the data directly.
 ```
@@ -84,16 +85,16 @@ struct.get_value("name_of_property", instance_id) # Returns "updated_value"
 - ***Memory:*** 8gb
 
 ### Source
-[Test Functions](test.gd) | [Data](benchmarks.txt)
+[Test Functions](test/test.gd) | [Data](test/benchmarks.txt)
 
 ### Memory Usage
-![Memory Usage per 100k instances](Memory100k.png)
+![Memory Usage per 100k instances](test/Memory100k.png)
 
 ### Construction Speed
-![Construction Speed per 100k instances](Construction100k.png)
+![Construction Speed per 100k instances](test/Construction100k.png)
 
 ### Property Set Speed
-![Property Set Speed](SetSpeed.png)
+![Property Set Speed](test/SetSpeed.png)
 
 ### Property Get Speed
-![Property Get Speed](GetSpeed.png)
+![Property Get Speed](test/GetSpeed.png)

@@ -11,13 +11,11 @@ enum DataType {
     TypeColor
 }
 
-
 var _data               : Dictionary
 var _property_defaults  : Dictionary
 var _property_types     : Dictionary
 var _signals            : Dictionary
 var _count              : int
-
 
 func _instance() -> void:
     for property in _data.keys():
@@ -31,13 +29,11 @@ func instance() -> int:
 
 func group_instance(group_size: int) -> int:
     var c := _count
-    var d
     for prop in _data.keys():
         _data[prop].resize(_count + group_size)
     var id := WorkerThreadPool.add_group_task(_instance, group_size)
     WorkerThreadPool.wait_for_group_task_completion(id)
     return c
-
 
 func delete(sid: int) -> void:
     for property in _data.keys():

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b6r05n62lcvms"
-path="res://.godot/imported/SetSpeed.png-56cbcd57890c45c78ab1158700059a20.ctex"
+uid="uid://b1dv6xiufou6s"
+path="res://.godot/imported/Construction100k.png-6660d294c5e0a8b0999f20793b66416a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://SetSpeed.png"
-dest_files=["res://.godot/imported/SetSpeed.png-56cbcd57890c45c78ab1158700059a20.ctex"]
+source_file="res://test/Construction100k.png"
+dest_files=["res://.godot/imported/Construction100k.png-6660d294c5e0a8b0999f20793b66416a.ctex"]
 
 [params]
 
