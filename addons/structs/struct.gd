@@ -3,9 +3,67 @@ class_name Struct extends Resource
 ## A struct implementation using the Server/Resource pattern.
 ##
 ## Structs are an abstraction over type safe, and highly memory efficient data pools.
+## Creating a struct is done by passing in a list of Dictionary's describing the properties:
 ##
-## For usage examples and help, see README.md.
-## @tutorial:            https://github.com/Anaxarchus/gdscript-structs
+## [codeblock]
+## var car := Struct.new([
+##    {"name":"make", "type":Struct.DataType.TypeString, "default":""},
+##    {"name":"model", "type":Struct.DataType.TypeString, "default":""},
+##    {"name":"year", "type":Struct.DataType.TypeInt32, "default":0},
+##    {"name":"color", "type":Struct.DataType.TypeColor, "default":Color.WHITE},
+## ])
+## [/codeblock]
+##
+## Instancing can be done by simply defining the number of instances, or more discretely with [method Struct.instance]
+## [codeblock]
+## car.instance_count = 20
+## var my_car := car.instance()
+## print( my_car ) # 20
+## [/codeblock]
+##
+## Setting and Getting is done using Godot's Server pattern, using the index of the instance as id:
+## [codeblock]
+## car.instance_set_property(my_car, "make", "Batmobile")
+## var my_car_make: String = car.instance_get_property(my_car, "make")
+## print( my_car_make ) # Batmobile
+## [/codeblock]
+##
+## Setting and Getting can be made more performant by using [method Struct.instance_get_at] and [method Struct.instance_set_at] methods:
+## [codeblock]
+## # The index of the property `make` matches the order in which we passed them to the struct in Struct.new()
+## var make_property_index: int = 0
+##
+## car.instance_set_at(my_car, make_property_index, "Batmobile")
+## var my_car_make: String = car.instance_get_at(my_car, make_property_index)
+## print( my_car_make ) # Batmobile
+## [/codeblock]
+##
+## This class becomes much friendlier when we extend it:
+## [codeblock]
+## class_name Car extends Struct
+##
+## func _init():
+##    property_add("make", Struct.DataType.TypeString, "")
+##
+## func new(make: String) -> int:
+##     return instance({"make":make})
+##
+## func set_instance_make(instance_id: int, value: String) -> void:
+##     data[0][instance_id] = value
+##
+## func get_instance_make(instance_id: int) -> String:
+##     return data[0][instance_id]
+## [/codeblock]
+##
+## [codeblock]
+## var car := Car.new()
+## var my_car := car.new("KITT")
+## print( car.get_instance_make(my_car) ) # KITT
+##
+## car.set_instance_make(my_car, "Batmobile")
+## print( car.get_instance_make(my_car) ) # Batmobile
+## [/codeblock]
+##
 ## @experimental
 
 ## Valid data types the Struct class is built to handle.
@@ -60,6 +118,7 @@ func _init(properties:Array[Dictionary] = [], initial_instance_count:int = 0):
         property_add(property.name, property.type, property.default)
     instance_count = initial_instance_count
 
+## This method will completely wipe the struct, clearing both instance and property data.
 func clear():
     data.clear()
     property_types.clear()
@@ -67,6 +126,7 @@ func clear():
     property_names.clear()
     instance_count = 0
 
+## Adds a property column to the struct table.
 func property_add(name: String, type: DataType, default: Variant=null) -> int:
     data.append(_type_get_packed_array(type, instance_count))
     var pid:int = property_names.size()
@@ -75,6 +135,7 @@ func property_add(name: String, type: DataType, default: Variant=null) -> int:
     property_types.append(type)
     return pid
 
+## Removes a property column from the struct table.
 func property_remove(pid: int) -> void:
     if pid < 0 or pid > property_names.size():
         return
@@ -83,47 +144,56 @@ func property_remove(pid: int) -> void:
     property_defaults.remove_at(pid)
     property_types.remove_at(pid)
 
+## Clears a property of all it's data, resetting every instance's value to the default value for that property.
 func property_clear(pid: int) -> void:
     if pid < 0 or pid > property_names.size():
         return
     data[pid].fill(property_defaults[pid])
 
+## Get the name associated with the property of the given index.
 func property_get_name(pid: int) -> String:
     if pid < 0 or pid > property_names.size():
         return ""
     return property_names[pid]
 
+## Get the DataType associated with the property of the given index.
 func property_get_type(pid: int) -> DataType:
     if pid < 0 or pid > property_names.size():
         return -1
     return property_types[pid]
 
+## Get the default value associated with the property of the given index.
 func property_get_default(pid: int) -> Variant:
     if pid < 0 or pid > property_names.size():
         return null
     return property_defaults[pid]
 
+## Get the index of the property with the given name.
 func property_get_id(property: String) -> int:
     return property_names.find(property)
 
-func instance() -> int:
+## Increments the instance counter and returns the count. Useful abstraction for storing the id of particular instances:
+## Can optionally pass in initial data in a dictionary: [code]{"property":"value"}[/code]
+func instance(initial_data: Dictionary = {}) -> int:
     instance_count += 1
+    for key in initial_data.keys():
+        instance_set_property(instance_count, key, initial_data[key])
     return instance_count
 
-func instance_set_property(property: String, sid: int, value: Variant) -> void:
+func instance_set_property(sid: int, property: String, value: Variant) -> void:
     if !property_names.has(property):
         return
     data[property_names.find(property)][sid] = value
 
-func instance_get_property(property: String, sid: int) -> Variant:
+func instance_get_property(sid: int, property: String) -> Variant:
     if !property_names.has(property):
         return
     return data[property_names.find(property)][sid]
 
-func instance_set_at(pid: int, sid: int, value: Variant) -> void:
+func instance_set_at(sid: int, pid:int, value: Variant) -> void:
     data[pid][sid] = value
 
-func instance_get_at(pid: int, sid: int) -> Variant:
+func instance_get_at(sid: int, pid:int) -> Variant:
     return data[pid][sid]
 
 func instance_get(sid: int) -> Array[Variant]:
@@ -153,7 +223,6 @@ func instance_clear(sid: int) -> void:
     for i in property_names.size():
         data[i][sid] = property_defaults[i]
 
-## Returns the zero value for a given DataType.
 func _type_get_default(type: DataType) -> Variant:
     match type:
         DataType.TypeString:

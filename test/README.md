@@ -13,3 +13,14 @@
 | Node2D   | 100,000 | 185.41322 | 569.82039 | 319.4809  |
 
 NOTE: all times are based on an average taken from 100 operations.
+
+Each object type was given the following properties, if they didn't previously exist:
+```
+    var editor_description: String = "some description"
+    var name: String = "TestObject"
+    var process_mode: int = 1
+    var process_physics_priority: int = 999
+    var process_priority: int = 999
+    var process_thread_group_order: int = 999
+    var scene_file_path: String = "some/filepath/to/somewhere"
+```
