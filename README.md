@@ -62,7 +62,7 @@ func get_instance_make(instance_id: int) -> String:
 ```
 
 Now we can interact in a manner that's at least somewhat more object oriented:
-```
+```gdscript
 var car := Car.new()
 var my_car := car.new("KITT")
 print( car.get_instance_make(my_car) ) # KITT
