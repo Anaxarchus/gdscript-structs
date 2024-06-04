@@ -1,4 +1,4 @@
-# BaseStruct Class
+# Struct Class
 
 ## Overview
 
@@ -9,7 +9,7 @@ The `BaseStruct` class is an extendable `Resource` implementing Godot's server/r
 ### Type Safety
 Data is kept in typed arrays. The default getter and setter use the `Variant` type. To Rigidly enforce type safety, extend the class and implement typed getters and setters for each property:
 ```
-class_name SpatialStruct extends BaseStruct
+class_name SpatialStruct extends Struct
 
 func _init():
     add_property("position", DataType.Vector3, Vector3.ZERO)
@@ -20,15 +20,15 @@ func set_position(instance_id: int, value: Vector3) -> void:
 func get_position(instance_id: int) -> Vector3:
     return get_value("position", instance_id)
 ```
-[Full Example](test/test_struct.gd)
+[Full Example](test/example_struct.gd)
 
 To improve speeds, skip the overhead of the extra function call and interact with the data directly.
 ```
 func set_position(instance_id: int, value: Vector3) -> void:
-    _data["position"][instance_id] = value
+    data["position"][instance_id] = value
 
 func get_position(instance_id: int) -> Vector3:
-    return _data["position"][instance_id]
+    return data["position"][instance_id]
 ```
 
 ### Signals
@@ -52,14 +52,14 @@ The class extends `Resource`, and is designed to be able to easily save and load
 ### Defining Properties
 Properties are defined through the `add_property` method.
 ```
-var struct := BaseStruct.new()
+var struct := Struct.new()
 struct.add_property("name", BaseStruct.DataType.String, "MyStruct")
 ```
 
 ### Creating and Deleting Instances
 Creating new instances is straightforward, and the constructor method returns the id of the instance.
 ```
-var struct := BaseStruct.new()
+var struct := Struct.new()
 
 # Create a new instance
 var instance_id: int = struct.instance()
@@ -71,7 +71,7 @@ struct.delete(instance_id)
 ### Getting and Setting instance values
 ```
 var struct := BaseStruct.new()
-struct.add_property("name_of_property", BaseStruct.DataType.String, "value_of_property")
+struct.add_property("name_of_property", BaseStruct.DataType.String, "default_value")
 var instance_id: int = struct.instance()
 
 struct.set_value("name_of_property", instance_id, "updated_value")
