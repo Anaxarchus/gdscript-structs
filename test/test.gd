@@ -1,22 +1,52 @@
 extends Node2D
 
+
+# Number of set calls to generate
+const SetSamples:int = 100
+# Number of Objects to call the set calls on
+const ObjectSamples:int = 1000
 var start_time: float
 
+var output: String
 
 
 
 func _ready() -> void:
+    var which:int = 4
     var count: int = 100_000
-    var sets := generate_sets(100)
+    #var count: int = 250_000
+    #var count: int = 500_000
+    #var count: int = 1_000_000
+    var sets := generate_sets(SetSamples)
 
-    print("sets hash: ", sets.hash())
+    #output += "CPU: " + OS.get_processor_name() + "\n"
+    #output += ("Times Averaged from {0} property queries in each of {1} Object instances for a total of {2} samples\n\n".format([SetSamples, ObjectSamples, SetSamples*ObjectSamples]))
+    #print("")
+    #output += "| Type | Count | Data Hash | Usage (mb) | Set Time (nanoseconds) | Get Time (nanoseconds) |\n"
+    #output += "|______|_______|___________|____________|________________________|________________________|\n"
+    output = FileAccess.get_file_as_string("res://test/benchmarks.txt")
 
     var sample_instance:int = randi_range(0, count-1)
-    #test_structs(count, sets, sample_instance)
-    #test_objects(count, sets, sample_instance)
-    #test_resources(count, sets, sample_instance)
-    #test_nodes(count, sets, sample_instance)
-    test_node2ds(count, sets, sample_instance)
+    match which:
+        0:
+            test_structs(count, sets, sample_instance)
+        1:
+            test_objects(count, sets, sample_instance)
+        2:
+            test_resources(count, sets, sample_instance)
+        3:
+            test_nodes(count, sets, sample_instance)
+        4:
+            test_node2ds(count, sets, sample_instance)
+
+    var file := FileAccess.open("res://test/benchmarks.txt", FileAccess.WRITE)
+    if file != null:
+        file.store_string(output)
+        file.close()
+    else:
+        print("could not store data: ", FileAccess.get_open_error())
+        ERR_PARSE_ERROR
+    print_rich("[color=green]Finished[/color]")
 
 func test_structs(count: int, sets: Array[Dictionary], subject: int):
     var struct := Struct.new([
@@ -35,8 +65,9 @@ func test_structs(count: int, sets: Array[Dictionary], subject: int):
     var construction_time := time_end()
 
     time_start()
-    for row in sets:
-        struct.instance_set_property(row.property, subject, row.value)
+    for x in ObjectSamples:
+        for row in sets:
+            struct.instance_set_property(subject, row.property, row.value)
     var set_property_time := time_end()
 
     var pids := sets.duplicate(true)
@@ -44,44 +75,50 @@ func test_structs(count: int, sets: Array[Dictionary], subject: int):
         pids[x].property = struct.property_get_id(pids[x].property)
 
     time_start()
-    for row in pids:
-        struct.instance_set_at(row.property, subject, row.value)
+    for x in ObjectSamples:
+        for row in pids:
+            struct.instance_set_at(subject, row.property, row.value)
     var set_at_time := time_end()
 
     time_start()
-    for row in sets:
-        struct.instance_get_property(row.property, subject)
+    for x in ObjectSamples:
+        for row in sets:
+            struct.instance_get_property(subject, row.property)
     var get_property_time := time_end()
 
     time_start()
-    for row in pids:
-        struct.instance_get_at(row.property, subject)
+    for x in ObjectSamples:
+        for row in pids:
+            struct.instance_get_at(subject, row.property)
     var get_at_time := time_end()
 
     var memory := OS.get_static_memory_usage()
 
-    print("\nTest Results: Structs -----------------------")
-    print("Number of instances: ", count)
-    print("Construction time: ", construction_time)
-    print("")
-    print("Total Memory Used Before Instancing: ", float(bmu)/1_000_000, "mb")
-    print("Total Memory Used After Instancing: ", float(memory)/1_000_000, "mb")
-    print("    Struct Memory Usage: ", float(memory-bmu)/1_000_000, "mb")
-    print("")
-    print("Number of properties set: ", sets.size())
-    print("    Time to set all instances using property: ", set_property_time)
-    print("    Average set property time per instance: ", set_property_time/sets.size())
-    print("")
-    print("    Time to set all instances using index: ", set_at_time)
-    print("    Average set at time per instance: ", set_at_time/sets.size())
-    print("")
-    print("Number of properties get: ", sets.size())
-    print("    Time to get all instances using property: ", get_property_time)
-    print("    Average get property time per instance: ", get_property_time/sets.size())
-    print("")
-    print("    Time to get all instances using index: ", get_at_time)
-    print("    Average get at time per instance: ", get_at_time/sets.size())
-    print("----------------------------------------------\n")
+    print_results("Struct (using property name)", count, sets.hash(), float(memory-bmu), set_property_time, get_property_time)
+    print_results("Struct (using property index)", count, sets.hash(), float(memory-bmu), set_at_time, get_at_time)
+
+    #print("\nTest Results: Structs -----------------------")
+    #print("Number of instances: ", count)
+    #print("Construction time: ", construction_time)
+    #print("")
+    #print("Total Memory Used Before Instancing: ", float(bmu)/1_000_000, "mb")
+    #print("Total Memory Used After Instancing: ", float(memory)/1_000_000, "mb")
+    #print("    Struct Memory Usage: ", float(memory-bmu)/1_000_000, "mb")
+    #print("")
+    #print("Number of properties set: ", sets.size())
+    #print("    Time to set all instances using property: ", set_property_time)
+    #print("    Average set property time per instance: ", set_property_time/sets.size())
+    #print("")
+    #print("    Time to set all instances using index: ", set_at_time)
+    #print("    Average set at time per instance: ", set_at_time/sets.size())
+    #print("")
+    #print("Number of properties get: ", sets.size())
+    #print("    Time to get all instances using property: ", get_property_time)
+    #print("    Average get property time per instance: ", get_property_time/sets.size())
+    #print("")
+    #print("    Time to get all instances using index: ", get_at_time)
+    #print("    Average get at time per instance: ", get_at_time/sets.size())
+    #print("----------------------------------------------\n")
 
 
 func test_objects(count: int, sets: Array[Dictionary], subject: int):
@@ -95,30 +132,34 @@ func test_objects(count: int, sets: Array[Dictionary], subject: int):
     var memory := OS.get_static_memory_usage() - bmu
 
     time_start()
-    for prop in sets:
-        list[subject].set(prop.property, prop.value)
+    for x in ObjectSamples:
+        for prop in sets:
+            list[subject].set(prop.property, prop.value)
     var set_time := time_end()
 
     time_start()
-    for prop in sets:
-        list[subject].get(prop.property)
+    for x in ObjectSamples:
+        for prop in sets:
+            list[subject].get(prop.property)
     var get_time := time_end()
 
     for obj in list:
         obj.free()
 
-    print("\nTest Results: Objects -----------------------")
-    print("Number of instances: ", count)
-    print("    Memory usage: ", float(memory)/1_000_000, "mb")
-    print("")
-    print("Number of properties set: ", sets.size())
-    print("    Time to complete all sets: ", set_time)
-    print("    Average set time: ", set_time/sets.size())
-    print("")
-    print("Number of properties get: ", sets.size())
-    print("    Time to complete all gets: ", get_time)
-    print("    Average get time: ", get_time/sets.size())
-    print("----------------------------------------------\n")
+    print_results("Object", count, sets.hash(), float(memory-bmu), set_time, get_time)
+
+    #print("\nTest Results: Objects -----------------------")
+    #print("Number of instances: ", count)
+    #print("    Memory usage: ", float(memory)/1_000_000, "mb")
+    #print("")
+    #print("Number of properties set: ", sets.size())
+    #print("    Time to complete all sets: ", set_time)
+    #print("    Average set time: ", set_time/sets.size())
+    #print("")
+    #print("Number of properties get: ", sets.size())
+    #print("    Time to complete all gets: ", get_time)
+    #print("    Average get time: ", get_time/sets.size())
+    #print("----------------------------------------------\n")
 
 func test_resources(count: int, sets: Array[Dictionary], subject: int):
     var bmu := OS.get_static_memory_usage()
@@ -131,27 +172,31 @@ func test_resources(count: int, sets: Array[Dictionary], subject: int):
     var memory := OS.get_static_memory_usage() - bmu
 
     time_start()
-    for prop in sets:
-        list[subject].set(prop.property, prop.value)
+    for x in ObjectSamples:
+        for prop in sets:
+            list[subject].set(prop.property, prop.value)
     var set_time := time_end()
 
     time_start()
-    for prop in sets:
-        list[subject].get(prop.property)
+    for x in ObjectSamples:
+        for prop in sets:
+            list[subject].get(prop.property)
     var get_time := time_end()
 
-    print("\nTest Results: Resources ----------------------")
-    print("Number of instances: ", count)
-    print("    Memory usage: ", float(memory)/1_000_000, "mb")
-    print("")
-    print("Number of properties set: ", sets.size())
-    print("    Time to complete all sets: ", set_time)
-    print("    Average set time: ", set_time/sets.size())
-    print("")
-    print("Number of properties get: ", sets.size())
-    print("    Time to complete all gets: ", get_time)
-    print("    Average get time: ", get_time/sets.size())
-    print("----------------------------------------------\n")
+    print_results("Resource", count, sets.hash(), float(memory-bmu), set_time, get_time)
+
+    #print("\nTest Results: Resources ----------------------")
+    #print("Number of instances: ", count)
+    #print("    Memory usage: ", float(memory)/1_000_000, "mb")
+    #print("")
+    #print("Number of properties set: ", sets.size())
+    #print("    Time to complete all sets: ", set_time)
+    #print("    Average set time: ", set_time/sets.size())
+    #print("")
+    #print("Number of properties get: ", sets.size())
+    #print("    Time to complete all gets: ", get_time)
+    #print("    Average get time: ", get_time/sets.size())
+    #print("----------------------------------------------\n")
 
 func test_nodes(count: int, sets: Array[Dictionary], subject: int):
     var bmu := OS.get_static_memory_usage()
@@ -164,30 +209,34 @@ func test_nodes(count: int, sets: Array[Dictionary], subject: int):
     var memory := OS.get_static_memory_usage() - bmu
 
     time_start()
-    for prop in sets:
-        list[subject].set(prop.property, prop.value)
+    for x in ObjectSamples:
+        for prop in sets:
+            list[subject].set(prop.property, prop.value)
     var set_time := time_end()
 
     time_start()
-    for prop in sets:
-        list[subject].get(prop.property)
+    for x in ObjectSamples:
+        for prop in sets:
+            list[subject].get(prop.property)
     var get_time := time_end()
 
     for obj in list:
         obj.queue_free()
 
-    print("\nTest Results: Nodes -------------------------")
-    print("Number of instances: ", count)
-    print("    Memory usage: ", float(memory)/1_000_000, "mb")
-    print("")
-    print("Number of properties set: ", sets.size())
-    print("    Time to complete all sets: ", set_time)
-    print("    Average set time: ", set_time/sets.size())
-    print("")
-    print("Number of properties get: ", sets.size())
-    print("    Time to complete all gets: ", get_time)
-    print("    Average get time: ", get_time/sets.size())
-    print("----------------------------------------------\n")
+    print_results("Node", count, sets.hash(), float(memory-bmu), set_time, get_time)
+
+    #print("\nTest Results: Nodes -------------------------")
+    #print("Number of instances: ", count)
+    #print("    Memory usage: ", float(memory)/1_000_000, "mb")
+    #print("")
+    #print("Number of properties set: ", sets.size())
+    #print("    Time to complete all sets: ", set_time)
+    #print("    Average set time: ", set_time/sets.size())
+    #print("")
+    #print("Number of properties get: ", sets.size())
+    #print("    Time to complete all gets: ", get_time)
+    #print("    Average get time: ", get_time/sets.size())
+    #print("----------------------------------------------\n")
 
 func test_node2ds(count: int, sets: Array[Dictionary], subject: int):
     var bmu := OS.get_static_memory_usage()
@@ -200,30 +249,34 @@ func test_node2ds(count: int, sets: Array[Dictionary], subject: int):
     var memory := OS.get_static_memory_usage() - bmu
 
     time_start()
-    for prop in sets:
-        list[subject].set(prop.property, prop.value)
+    for x in ObjectSamples:
+        for prop in sets:
+            list[subject].set(prop.property, prop.value)
     var set_time := time_end()
 
     time_start()
-    for prop in sets:
-        list[subject].get(prop.property)
+    for x in ObjectSamples:
+        for prop in sets:
+            list[subject].get(prop.property)
     var get_time := time_end()
 
     for obj in list:
         obj.queue_free()
 
-    print("\nTest Results: Node2Ds -----------------------")
-    print("Number of instances: ", count)
-    print("    Memory usage: ", float(memory)/1_000_000, "mb")
-    print("")
-    print("Number of properties set: ", sets.size())
-    print("    Time to complete all sets: ", set_time)
-    print("    Average set time: ", set_time/sets.size())
-    print("")
-    print("Number of properties get: ", sets.size())
-    print("    Time to complete all gets: ", get_time)
-    print("    Average get time: ", get_time/sets.size())
-    print("----------------------------------------------\n")
+    print_results("Node2D", count, sets.hash(), float(memory-bmu), set_time, get_time)
+
+    #print("\nTest Results: Node2Ds -----------------------")
+    #print("Number of instances: ", count)
+    #print("    Memory usage: ", float(memory)/1_000_000, "mb")
+    #print("")
+    #print("Number of properties set: ", sets.size())
+    #print("    Time to complete all sets: ", set_time)
+    #print("    Average set time: ", set_time/sets.size())
+    #print("")
+    #print("Number of properties get: ", sets.size())
+    #print("    Time to complete all gets: ", get_time)
+    #print("    Average get time: ", get_time/sets.size())
+    #print("----------------------------------------------\n")
 
 func time_start() -> float:
     start_time = Time.get_unix_time_from_system()
@@ -231,6 +284,10 @@ func time_start() -> float:
 
 func time_end() -> float:
     return Time.get_unix_time_from_system() - start_time
+
+func print_results(object_type: String, object_count: int, sample_data_hash: int, memory: float, set_time: float, get_time: float):
+    #print("| {0} | {1} | {2} | {3} | {4} | {5} |".format([object_type, object_count, sample_data_hash, snappedf(memory/1_000_000, 0.0001), snappedf(set_time*1e+9/ObjectSamples/SetSamples, 0.0001), snappedf(get_time*1e+9/ObjectSamples/SetSamples, 0.0001)]))
+    output += ("| {0} | {1} | {2} | {3} | {4} | {5} |\n".format([object_type, object_count, sample_data_hash, snappedf(memory/1_000_000, 0.0001), snappedf(set_time*1e+9/ObjectSamples/SetSamples, 0.0001), snappedf(get_time*1e+9/ObjectSamples/SetSamples, 0.0001)]))
 
 func generate_sets(count: int) -> Array[Dictionary]:
     var rng := RandomNumberGenerator.new()

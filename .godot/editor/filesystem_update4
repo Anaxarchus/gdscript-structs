@@ -1,6 +1,6 @@
 res://test/test.tscn
 res://test/test.gd
-res://addons/structs/struct.gd
 res://test/benchmarks_100k.txt
-res://README.md
+res://test/benchmarks.txt
 res://test/README.md
+res://README.md

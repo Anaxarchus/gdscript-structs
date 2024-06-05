@@ -16,6 +16,12 @@ The `Struct` class is an extendable `Resource` implementing Godot's server/resou
 - **Convenient Access Methods**: Access and manipulate data using property names or indices.
 - **Extensible**: Easily extend the class to create custom structured data types.
 
+
+## Benchmark
+
+Comparisons were run against other common Godot Object's to see how this class performed with regards to memory usage, set times and get times. [results](test/README.md)
+
+
 ## Usage
 
 ### Creating a Struct
