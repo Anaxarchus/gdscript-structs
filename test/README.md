@@ -4,8 +4,7 @@
 - **CPU** Apple M2
 - **Memory** 8gb
 
-CPU: Apple M2
-Times Averaged from 100 property queries in each of 1000 Object instances for a total of 100000 samples
+Times Averaged from 100 property queries in 1000 Object instance samples for a total of 100,000 samples
 
 | Type | **Count** | Data Hash | Usage (mb) | Set Time (nanoseconds) | Get Time (nanoseconds) |
 |------|-------|-----------|------------|------------------------|------------------------|
@@ -33,9 +32,6 @@ Times Averaged from 100 property queries in each of 1000 Object instances for a 
 | Node2D | 250,000 | 3970848985 | 405.0104 | 325.1886 | 285.6207 |
 | Node2D | 500,000 | 3970848985 | 865.6611 | 322.4516 | 284.6098 |
 | Node2D | 1,000,000 | 3970848985 | 1786.8829 | 326.3783 | 289.6905 |
-
-
-NOTE: all times are based on an average taken from 100 operations.
 
 Each object type was given the following properties, if they didn't previously exist:
 ```
