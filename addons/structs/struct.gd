@@ -66,16 +66,18 @@ class_name Struct extends Resource
 ##
 ## @experimental
 
+const TYPE_64BIT = (1<<6)
+
 ## Valid data types the Struct class is built to handle.
 enum DataType {
     ## Same as [enum Variant.Type.TYPE_STRING]
     TypeString = TYPE_STRING,
     ## Same as [enum Variant.Type.TYPE_INT]
-    TypeInt64 = TYPE_INT,
-    TypeInt32 = TYPE_INT*10,
+    TypeInt64 = TYPE_INT | TYPE_64BIT,
+    TypeInt32 = TYPE_INT,
     ## Same as [enum Variant.Type.TYPE_FLOAT]
-    TypeFloat64 = TYPE_FLOAT,
-    TypeFloat32 = TYPE_FLOAT*10,
+    TypeFloat64 = TYPE_FLOAT | TYPE_64BIT,
+    TypeFloat32 = TYPE_FLOAT,
     ## Same as [enum Variant.Type.TYPE_VECTOR2]
     TypeVector2 = TYPE_VECTOR2,
     ## Same as [enum Variant.Type.TYPE_VECTOR3]
